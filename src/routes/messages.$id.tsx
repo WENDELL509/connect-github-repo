@@ -3,6 +3,7 @@ import { ArrowLeft, Flag, Info, MapPin, Bookmark, User } from "lucide-react";
 import { AppShell } from "@/components/falcon/AppShell";
 import { Button } from "@/components/ui/button";
 import { getFirm } from "@/lib/firms";
+import { getPreviewFor } from "@/lib/message-previews";
 
 export const Route = createFileRoute("/messages/$id")({
   head: ({ params }) => {
