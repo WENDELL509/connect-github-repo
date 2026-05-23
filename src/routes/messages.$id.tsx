@@ -54,8 +54,8 @@ function Thread() {
   const { id } = Route.useParams();
   const firm = getFirm(id);
   const navigate = useNavigate();
-
-  if (!firm) return null;
+  const preview = firm ? getPreviewFor(firm.id) : null;
+  const location = firm?.address ?? firm?.name ?? "";
 
   return (
     <AppShell hideTopBar>
