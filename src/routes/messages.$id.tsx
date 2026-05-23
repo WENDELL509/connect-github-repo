@@ -57,6 +57,8 @@ function Thread() {
   const preview = firm ? getPreviewFor(firm.id) : null;
   const location = firm?.address ?? firm?.name ?? "";
 
+  if (!firm) return null;
+
   return (
     <AppShell hideTopBar>
       {/* Top brand bar (matches screenshot: orange pin + USEP, bookmark, avatar) */}
