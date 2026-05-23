@@ -10,9 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
-import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as ConfirmationRouteImport } from './routes/confirmation'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MessagesIndexRouteImport } from './routes/messages.index'
 import { Route as MessagesIdRouteImport } from './routes/messages.$id'
 import { Route as FirmIdRouteImport } from './routes/firm.$id'
 import { Route as FirmIdBookRouteImport } from './routes/firm.$id.book'
@@ -20,11 +20,6 @@ import { Route as FirmIdBookRouteImport } from './routes/firm.$id.book'
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MessagesRoute = MessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConfirmationRoute = ConfirmationRouteImport.update({
@@ -37,10 +32,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MessagesIndexRoute = MessagesIndexRouteImport.update({
+  id: '/messages/',
+  path: '/messages/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MessagesIdRoute = MessagesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => MessagesRoute,
+  id: '/messages/$id',
+  path: '/messages/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const FirmIdRoute = FirmIdRouteImport.update({
   id: '/firm/$id',
@@ -56,29 +56,29 @@ const FirmIdBookRoute = FirmIdBookRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/confirmation': typeof ConfirmationRoute
-  '/messages': typeof MessagesRouteWithChildren
   '/search': typeof SearchRoute
   '/firm/$id': typeof FirmIdRouteWithChildren
   '/messages/$id': typeof MessagesIdRoute
+  '/messages/': typeof MessagesIndexRoute
   '/firm/$id/book': typeof FirmIdBookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/confirmation': typeof ConfirmationRoute
-  '/messages': typeof MessagesRouteWithChildren
   '/search': typeof SearchRoute
   '/firm/$id': typeof FirmIdRouteWithChildren
   '/messages/$id': typeof MessagesIdRoute
+  '/messages': typeof MessagesIndexRoute
   '/firm/$id/book': typeof FirmIdBookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/confirmation': typeof ConfirmationRoute
-  '/messages': typeof MessagesRouteWithChildren
   '/search': typeof SearchRoute
   '/firm/$id': typeof FirmIdRouteWithChildren
   '/messages/$id': typeof MessagesIdRoute
+  '/messages/': typeof MessagesIndexRoute
   '/firm/$id/book': typeof FirmIdBookRoute
 }
 export interface FileRouteTypes {
@@ -86,37 +86,38 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/confirmation'
-    | '/messages'
     | '/search'
     | '/firm/$id'
     | '/messages/$id'
+    | '/messages/'
     | '/firm/$id/book'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/confirmation'
-    | '/messages'
     | '/search'
     | '/firm/$id'
     | '/messages/$id'
+    | '/messages'
     | '/firm/$id/book'
   id:
     | '__root__'
     | '/'
     | '/confirmation'
-    | '/messages'
     | '/search'
     | '/firm/$id'
     | '/messages/$id'
+    | '/messages/'
     | '/firm/$id/book'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfirmationRoute: typeof ConfirmationRoute
-  MessagesRoute: typeof MessagesRouteWithChildren
   SearchRoute: typeof SearchRoute
   FirmIdRoute: typeof FirmIdRouteWithChildren
+  MessagesIdRoute: typeof MessagesIdRoute
+  MessagesIndexRoute: typeof MessagesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,13 +127,6 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages': {
-      id: '/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof MessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/confirmation': {
@@ -149,12 +143,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/messages/': {
+      id: '/messages/'
+      path: '/messages'
+      fullPath: '/messages/'
+      preLoaderRoute: typeof MessagesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/messages/$id': {
       id: '/messages/$id'
-      path: '/$id'
+      path: '/messages/$id'
       fullPath: '/messages/$id'
       preLoaderRoute: typeof MessagesIdRouteImport
-      parentRoute: typeof MessagesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/firm/$id': {
       id: '/firm/$id'
@@ -173,18 +174,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface MessagesRouteChildren {
-  MessagesIdRoute: typeof MessagesIdRoute
-}
-
-const MessagesRouteChildren: MessagesRouteChildren = {
-  MessagesIdRoute: MessagesIdRoute,
-}
-
-const MessagesRouteWithChildren = MessagesRoute._addFileChildren(
-  MessagesRouteChildren,
-)
-
 interface FirmIdRouteChildren {
   FirmIdBookRoute: typeof FirmIdBookRoute
 }
@@ -199,10 +188,21 @@ const FirmIdRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfirmationRoute: ConfirmationRoute,
-  MessagesRoute: MessagesRouteWithChildren,
   SearchRoute: SearchRoute,
   FirmIdRoute: FirmIdRouteWithChildren,
+  MessagesIdRoute: MessagesIdRoute,
+  MessagesIndexRoute: MessagesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
