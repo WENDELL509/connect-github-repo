@@ -119,7 +119,7 @@ function Thread() {
 
             <div className="flex justify-start">
               <div className="max-w-[78%] rounded-2xl bg-muted/60 px-4 py-2.5 text-[13px] font-poppins text-foreground">
-                Please check the final <span className="text-primary font-semibold">pricelist</span>
+                {preview?.text ?? "Please check the final pricelist"}
               </div>
             </div>
           </div>
