@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { FIRMS } from "@/lib/firms";
 import { SEED_PREVIEWS, FALLBACK_PREVIEWS } from "@/lib/message-previews";
 
-export const Route = createFileRoute("/messages")({
+export const Route = createFileRoute("/messages/")({
   head: () => ({
     meta: [
       { title: "Messages — Falcon Geosolutions" },
