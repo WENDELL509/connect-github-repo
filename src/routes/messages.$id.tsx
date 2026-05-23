@@ -73,7 +73,7 @@ function Thread() {
         <div className="h-7 w-7 rounded-full bg-primary flex items-center justify-center">
           <MapPin className="h-4 w-4 text-primary-foreground" />
         </div>
-        <span className="font-display tracking-wide text-base">USEP</span>
+        <span className="font-display tracking-wide text-sm truncate max-w-[60%]">{location}</span>
         <div className="ml-auto flex items-center gap-3">
           <Bookmark className="h-5 w-5 text-primary fill-primary" />
           <div className="h-8 w-8 rounded-full bg-white text-[#0e1b3d] flex items-center justify-center">
