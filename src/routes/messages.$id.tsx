@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { ArrowLeft, Flag, Info, MoreHorizontal } from "lucide-react";
+import { ArrowLeft, Flag, Info, MapPin, Bookmark, User } from "lucide-react";
 import { AppShell } from "@/components/falcon/AppShell";
 import { Button } from "@/components/ui/button";
 import { getFirm } from "@/lib/firms";
@@ -31,43 +31,17 @@ export const Route = createFileRoute("/messages/$id")({
   component: Thread,
 });
 
-function Bubble({
-  side,
-  children,
-  muted = false,
-}: {
-  side: "in" | "out";
-  children: React.ReactNode;
-  muted?: boolean;
-}) {
+function TypingBubble({ side }: { side: "in" | "out" }) {
   return (
     <div className={`flex ${side === "in" ? "justify-start" : "justify-end"}`}>
-      <div
-        className={`max-w-[78%] rounded-2xl px-4 py-2.5 text-sm font-poppins shadow-sm ${
-          side === "in"
-            ? muted
-              ? "bg-card border border-border text-muted-foreground"
-              : "bg-card border border-border text-foreground"
-            : "gradient-primary text-primary-foreground"
-        }`}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function Typing() {
-  return (
-    <div className="flex justify-start">
-      <div className="bg-card border border-border rounded-2xl px-4 py-3 flex gap-1">
-        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce" />
+      <div className="rounded-full bg-muted/60 px-5 py-3 flex gap-1.5 items-center">
+        <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-bounce" />
         <span
-          className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce"
+          className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-bounce"
           style={{ animationDelay: "120ms" }}
         />
         <span
-          className="h-1.5 w-1.5 rounded-full bg-muted-foreground animate-bounce"
+          className="h-1.5 w-1.5 rounded-full bg-muted-foreground/70 animate-bounce"
           style={{ animationDelay: "240ms" }}
         />
       </div>
@@ -82,71 +56,83 @@ function Thread() {
 
   if (!firm) return null;
 
-  const initial = firm.name.charAt(0).toUpperCase();
-
   return (
     <AppShell hideTopBar>
-      <header className="sticky top-0 z-20 bg-background/90 backdrop-blur-xl border-b border-border px-4 py-3 flex items-center gap-3">
+      {/* Top brand bar (matches screenshot: orange pin + USEP, bookmark, avatar) */}
+      <header className="sticky top-0 z-30 bg-[#0e1b3d] text-white px-5 py-3 flex items-center gap-3">
         <button
           onClick={() => navigate({ to: "/messages" })}
           aria-label="Back"
-          className="h-10 w-10 rounded-xl bg-card border border-border flex items-center justify-center"
+          className="h-9 w-9 -ml-2 rounded-full flex items-center justify-center text-white/80 hover:text-white"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-5 w-5" />
         </button>
-        <div className="h-10 w-10 rounded-full gradient-primary flex items-center justify-center font-display text-sm text-primary-foreground shrink-0">
-          {initial}
+        <div className="h-7 w-7 rounded-full bg-primary flex items-center justify-center">
+          <MapPin className="h-4 w-4 text-primary-foreground" />
         </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-poppins font-semibold text-sm truncate">{firm.name}</p>
-          <p className="text-[11px] text-primary truncate">{firm.engineer}</p>
+        <span className="font-display tracking-wide text-base">USEP</span>
+        <div className="ml-auto flex items-center gap-3">
+          <Bookmark className="h-5 w-5 text-primary fill-primary" />
+          <div className="h-8 w-8 rounded-full bg-white text-[#0e1b3d] flex items-center justify-center">
+            <User className="h-4 w-4" />
+          </div>
         </div>
-        <button aria-label="Flag" className="text-primary p-2">
-          <Flag className="h-4 w-4" />
-        </button>
-        <button aria-label="Info" className="text-muted-foreground p-2">
-          <Info className="h-4 w-4" />
-        </button>
       </header>
 
-      <div className="px-4 py-5 space-y-3">
-        <p className="text-center text-[11px] text-muted-foreground font-poppins">4:00 PM</p>
+      {/* Chat card */}
+      <div className="px-3 pt-3">
+        <div className="bg-card rounded-2xl shadow-card-elegant overflow-hidden border border-border">
+          {/* Firm row */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+            <div className="h-9 w-9 rounded-full bg-[#0e1b3d] flex items-center justify-center text-white">
+              <User className="h-4 w-4" />
+            </div>
+            <p className="font-display text-[13px] tracking-wide text-[#0e1b3d] dark:text-foreground flex-1 truncate">
+              {firm.name}
+            </p>
+            <button aria-label="Flag" className="text-primary p-1">
+              <Flag className="h-4 w-4 fill-primary" />
+            </button>
+            <button aria-label="Info" className="text-muted-foreground p-1">
+              <Info className="h-4 w-4" />
+            </button>
+          </div>
 
-        <Bubble side="in">
-          <span className="text-primary font-semibold">{firm.name}</span>{" "}
-          accepted your <span className="text-primary font-semibold">request</span>
-        </Bubble>
+          {/* Messages */}
+          <div className="px-4 py-5 space-y-4 min-h-[420px]">
+            <p className="text-center text-[11px] text-muted-foreground font-poppins">4:00 PM</p>
 
-        <Typing />
+            <div className="flex justify-start">
+              <div className="max-w-[78%] rounded-2xl bg-muted/60 px-4 py-2.5 text-[13px] font-poppins text-foreground">
+                <span className="font-semibold">{firm.name}</span> accepted your{" "}
+                <span className="text-primary font-semibold">request</span>
+              </div>
+            </div>
 
-        <div className="flex justify-end">
-          <Typing />
+            <TypingBubble side="out" />
+            <TypingBubble side="in" />
+            <TypingBubble side="out" />
+            <TypingBubble side="in" />
+
+            <div className="flex justify-start">
+              <div className="max-w-[78%] rounded-2xl bg-muted/60 px-4 py-2.5 text-[13px] font-poppins text-foreground">
+                Please check the final <span className="text-primary font-semibold">pricelist</span>
+              </div>
+            </div>
+          </div>
+
+          {/* CHECK button */}
+          <div className="px-5 pb-5 pt-2">
+            <Button
+              variant="hero"
+              size="xl"
+              className="w-full font-display tracking-wider"
+              onClick={() => navigate({ to: "/firm/$id/book", params: { id: firm.id } })}
+            >
+              CHECK
+            </Button>
+          </div>
         </div>
-
-        <Typing />
-
-        <div className="flex justify-end">
-          <Typing />
-        </div>
-
-        <Bubble side="in">Please check the final pricelist</Bubble>
-      </div>
-
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 w-full max-w-[440px] px-5">
-        <Button
-          variant="hero"
-          size="xl"
-          className="w-full font-display"
-          onClick={() => navigate({ to: "/firm/$id/book", params: { id: firm.id } })}
-        >
-          CHECK
-        </Button>
-      </div>
-
-      <div className="fixed bottom-[88px] left-1/2 -translate-x-1/2 w-full max-w-[440px] flex justify-center">
-        <button className="text-muted-foreground p-2" aria-label="More">
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
       </div>
     </AppShell>
   );
