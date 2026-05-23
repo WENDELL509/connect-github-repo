@@ -50,21 +50,48 @@ function BookingForm() {
   const [date, setDate] = useState<Date | undefined>();
   const [notes, setNotes] = useState("");
 
+  const mapToSurveyType = (s: string): "RELOCATION_SURVEY" | "ORIGINAL_SURVEY" | "VERIFICATION_SURVEY" => {
+    const k = s.toLowerCase();
+    if (k.includes("relocation")) return "RELOCATION_SURVEY";
+    if (k.includes("verification") || k.includes("boundary")) return "VERIFICATION_SURVEY";
+    return "ORIGINAL_SURVEY";
+  };
+
   const quote = useMemo(() => {
     try {
-      return SurveyPricingEngine.generateProjectQuote({
-        surveyType: "RELOCATION_SURVEY",
-        areaInHectares: 12.5,
-        landUseType: "COMMERCIAL",
-        topoInterval: 0.5,
-        slopeDegrees: 22,
-        disbursements: 4500,
-        isHighRiskZone: true,
-      });
+      const accum = {
+        baseSurveyFee: 0,
+        zoningAdjustment: 0,
+        adjustedSurveyCost: 0,
+        topographicCost: 0,
+        establishmentFee: 0,
+        disbursementsOverhead: 0,
+        hazardPay: 0,
+        contingencyBuffer: 0,
+        firmProfit: 0,
+        statutoryVat: 0,
+      };
+      let total = 0;
+      for (const s of surveys) {
+        const q = SurveyPricingEngine.generateProjectQuote({
+          surveyType: mapToSurveyType(s),
+          areaInHectares: 12.5,
+          landUseType: "COMMERCIAL",
+          topoInterval: 0.5,
+          slopeDegrees: 22,
+          disbursements: 4500,
+          isHighRiskZone: true,
+        });
+        for (const k of Object.keys(accum) as (keyof typeof accum)[]) {
+          accum[k] += q.breakdown[k] ?? 0;
+        }
+        total += q.totalContractPrice;
+      }
+      return { breakdown: accum, totalContractPrice: Math.round(total * 100) / 100 };
     } catch {
       return null;
     }
-  }, []);
+  }, [surveys]);
 
   const billingRows = quote
     ? [
