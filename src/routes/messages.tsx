@@ -3,6 +3,7 @@ import { ArrowLeft, Search } from "lucide-react";
 import { AppShell } from "@/components/falcon/AppShell";
 import { Input } from "@/components/ui/input";
 import { FIRMS } from "@/lib/firms";
+import { SEED_PREVIEWS, FALLBACK_PREVIEWS } from "@/lib/message-previews";
 
 export const Route = createFileRoute("/messages")({
   head: () => ({
@@ -16,19 +17,6 @@ export const Route = createFileRoute("/messages")({
   }),
   component: Messages,
 });
-
-// Static seed previews so the inbox feels alive.
-const SEED_PREVIEWS: Record<string, { text: string; time: string; unread?: boolean }> = {
-  vedua: { text: "Booking received — we'll confirm schedule by tomorrow.", time: "now", unread: true },
-};
-
-const FALLBACK_PREVIEWS = [
-  { text: "Thanks for reaching out. Sending the quote shortly.", time: "2h" },
-  { text: "We're available this Friday for the site visit.", time: "1d" },
-  { text: "Could you share the lot's TCT number?", time: "2d" },
-  { text: "Survey completed — drafting the plan now.", time: "3d" },
-  { text: "Welcome to Falcon. How can we help?", time: "5d" },
-];
 
 function Messages() {
   const navigate = useNavigate();
