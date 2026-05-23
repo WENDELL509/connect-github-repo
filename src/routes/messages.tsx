@@ -78,7 +78,7 @@ function Messages() {
         {threads.map((t, i) => (
           <button
             key={t.id}
-            onClick={() => navigate({ to: "/firm/$id", params: { id: t.id } })}
+            onClick={() => navigate({ to: "/messages/$id", params: { id: t.id } })}
             className="w-full text-left flex items-center gap-3 p-3 rounded-2xl hover:bg-card transition-all animate-fade-up"
             style={{ animationDelay: `${i * 30}ms` }}
           >

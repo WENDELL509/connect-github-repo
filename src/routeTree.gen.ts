@@ -13,6 +13,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as MessagesRouteImport } from './routes/messages'
 import { Route as ConfirmationRouteImport } from './routes/confirmation'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MessagesIdRouteImport } from './routes/messages.$id'
 import { Route as FirmIdRouteImport } from './routes/firm.$id'
 import { Route as FirmIdBookRouteImport } from './routes/firm.$id.book'
 
@@ -36,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MessagesIdRoute = MessagesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => MessagesRoute,
+} as any)
 const FirmIdRoute = FirmIdRouteImport.update({
   id: '/firm/$id',
   path: '/firm/$id',
@@ -50,26 +56,29 @@ const FirmIdBookRoute = FirmIdBookRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/confirmation': typeof ConfirmationRoute
-  '/messages': typeof MessagesRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/search': typeof SearchRoute
   '/firm/$id': typeof FirmIdRouteWithChildren
+  '/messages/$id': typeof MessagesIdRoute
   '/firm/$id/book': typeof FirmIdBookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/confirmation': typeof ConfirmationRoute
-  '/messages': typeof MessagesRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/search': typeof SearchRoute
   '/firm/$id': typeof FirmIdRouteWithChildren
+  '/messages/$id': typeof MessagesIdRoute
   '/firm/$id/book': typeof FirmIdBookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/confirmation': typeof ConfirmationRoute
-  '/messages': typeof MessagesRoute
+  '/messages': typeof MessagesRouteWithChildren
   '/search': typeof SearchRoute
   '/firm/$id': typeof FirmIdRouteWithChildren
+  '/messages/$id': typeof MessagesIdRoute
   '/firm/$id/book': typeof FirmIdBookRoute
 }
 export interface FileRouteTypes {
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/search'
     | '/firm/$id'
+    | '/messages/$id'
     | '/firm/$id/book'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -88,6 +98,7 @@ export interface FileRouteTypes {
     | '/messages'
     | '/search'
     | '/firm/$id'
+    | '/messages/$id'
     | '/firm/$id/book'
   id:
     | '__root__'
@@ -96,13 +107,14 @@ export interface FileRouteTypes {
     | '/messages'
     | '/search'
     | '/firm/$id'
+    | '/messages/$id'
     | '/firm/$id/book'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfirmationRoute: typeof ConfirmationRoute
-  MessagesRoute: typeof MessagesRoute
+  MessagesRoute: typeof MessagesRouteWithChildren
   SearchRoute: typeof SearchRoute
   FirmIdRoute: typeof FirmIdRouteWithChildren
 }
@@ -137,6 +149,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/messages/$id': {
+      id: '/messages/$id'
+      path: '/$id'
+      fullPath: '/messages/$id'
+      preLoaderRoute: typeof MessagesIdRouteImport
+      parentRoute: typeof MessagesRoute
+    }
     '/firm/$id': {
       id: '/firm/$id'
       path: '/firm/$id'
@@ -154,6 +173,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MessagesRouteChildren {
+  MessagesIdRoute: typeof MessagesIdRoute
+}
+
+const MessagesRouteChildren: MessagesRouteChildren = {
+  MessagesIdRoute: MessagesIdRoute,
+}
+
+const MessagesRouteWithChildren = MessagesRoute._addFileChildren(
+  MessagesRouteChildren,
+)
+
 interface FirmIdRouteChildren {
   FirmIdBookRoute: typeof FirmIdBookRoute
 }
@@ -168,7 +199,7 @@ const FirmIdRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfirmationRoute: ConfirmationRoute,
-  MessagesRoute: MessagesRoute,
+  MessagesRoute: MessagesRouteWithChildren,
   SearchRoute: SearchRoute,
   FirmIdRoute: FirmIdRouteWithChildren,
 }
