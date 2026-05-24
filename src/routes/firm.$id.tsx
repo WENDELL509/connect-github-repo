@@ -52,8 +52,16 @@ function FirmProfile() {
     Service: initialRating,
   });
 
-  const toggle = (s: string) =>
-    setSelected((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
+  const LAND_DIVISION = ["Subdivision", "Consolidation", "Sub-Consol"];
+  const toggle = (s: string) => {
+    setSelected((p) => {
+      if (p.includes(s)) return p.filter((x) => x !== s);
+      if (LAND_DIVISION.includes(s)) {
+        return [...p.filter((x) => !LAND_DIVISION.includes(x)), s];
+      }
+      return [...p, s];
+    });
+  };
 
   const onBook = () => {
     bookingStore.set({ selectedSurveys: selected, firmId: firm.id });
