@@ -52,7 +52,10 @@ function FirmProfile() {
     Service: initialRating,
   });
 
+  const [lotCount, setLotCount] = useState<number>(2);
+
   const LAND_DIVISION = ["Subdivision", "Consolidation", "Sub-Consol"];
+  const selectedLandDivision = selected.find((x) => LAND_DIVISION.includes(x));
   const toggle = (s: string) => {
     setSelected((p) => {
       if (p.includes(s)) return p.filter((x) => x !== s);
@@ -160,6 +163,43 @@ function FirmProfile() {
                   );
                 })}
               </div>
+              {c.title === "Land Division" && selectedLandDivision && (
+                <div className="mt-3 rounded-2xl bg-card border border-border p-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-poppins">
+                      {selectedLandDivision} — Number of Lots
+                    </p>
+                    <p className="text-xs text-foreground/70 font-poppins mt-0.5">
+                      How many lots do you need?
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setLotCount((n) => Math.max(1, n - 1))}
+                      className="h-9 w-9 rounded-lg bg-secondary/60 border border-border font-poppins text-base"
+                      aria-label="Decrease lots"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      value={lotCount}
+                      onChange={(e) => setLotCount(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="h-9 w-16 rounded-lg bg-input border border-border text-center font-poppins text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setLotCount((n) => n + 1)}
+                      className="h-9 w-9 rounded-lg gradient-primary text-primary-foreground font-poppins text-base shadow-pin"
+                      aria-label="Increase lots"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

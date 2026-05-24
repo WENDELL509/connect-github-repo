@@ -187,6 +187,7 @@ function BookingForm() {
               <FieldTrigger placeholder="Select vegetation" />
               <SelectContent>
                 <SelectItem value="clear">Clear</SelectItem>
+                <SelectItem value="light">Lightly vegetated</SelectItem>
                 <SelectItem value="heavy">Heavily vegetated</SelectItem>
               </SelectContent>
             </Select>
