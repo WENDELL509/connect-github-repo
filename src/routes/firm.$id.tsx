@@ -157,44 +157,6 @@ function FirmProfile() {
         </div>
       </div>
 
-      {/* Status Tracker */}
-      <div className="px-5 mt-8">
-        <h2 className="font-display text-base mb-3">Status</h2>
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { label: "Received", icon: MailIcon },
-            { label: "Conduct Field", icon: HardHat },
-            { label: "Processing", icon: Settings },
-            { label: "Done", icon: Package },
-          ].map((s, i) => {
-            const Icon = s.icon;
-            const reached = i <= currentStatus;
-            return (
-              <div key={s.label} className="flex flex-col items-center gap-2">
-                <div
-                  className={cn(
-                    "h-12 w-12 rounded-2xl flex items-center justify-center border",
-                    reached
-                      ? "gradient-primary border-transparent shadow-pin"
-                      : "bg-secondary/50 border-border",
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      "h-5 w-5",
-                      reached ? "text-primary-foreground" : "text-muted-foreground",
-                    )}
-                  />
-                </div>
-                <span className="text-[10px] font-poppins text-center text-foreground/80 leading-tight">
-                  {s.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Rate */}
       <div className="px-5 mt-7">
         <h2 className="font-display text-base mb-3">Rate</h2>
@@ -225,28 +187,6 @@ function FirmProfile() {
         </div>
       </div>
 
-      {/* Feedback */}
-      <div className="px-5 mt-7">
-        <h2 className="font-display text-base mb-3">Feedback</h2>
-        <Textarea
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          placeholder="Share your experience with this firm..."
-          className="min-h-[100px] rounded-2xl bg-input border-border font-poppins"
-        />
-        <Button
-          variant="outline"
-          className="w-full mt-3 font-poppins"
-          onClick={() => {
-            toast.success("Feedback submitted", {
-              description: "Thanks for rating this firm.",
-            });
-            setFeedback("");
-          }}
-        >
-          Submit Feedback
-        </Button>
-      </div>
 
       {/* Bottom spacer so sticky CTA doesn't cover content */}
       <div className="h-32" />
