@@ -52,7 +52,10 @@ function FirmProfile() {
     Service: initialRating,
   });
 
+  const [lotCount, setLotCount] = useState<number>(2);
+
   const LAND_DIVISION = ["Subdivision", "Consolidation", "Sub-Consol"];
+  const selectedLandDivision = selected.find((x) => LAND_DIVISION.includes(x));
   const toggle = (s: string) => {
     setSelected((p) => {
       if (p.includes(s)) return p.filter((x) => x !== s);
