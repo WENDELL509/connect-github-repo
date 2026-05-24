@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link, Outlet, createFileRoute, useLocation, useNavigate, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Phone, Mail, MapPin, Clock, Star, Share2, Mail as MailIcon, HardHat, Settings, Package } from "lucide-react";
+import { ArrowLeft, Phone, Mail, MapPin, Clock, Star, Share2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { AppShell } from "@/components/falcon/AppShell";
 import { bookingStore } from "@/lib/booking";
 import { getFirm } from "@/lib/firms";
