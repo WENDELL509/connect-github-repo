@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link, Outlet, createFileRoute, useLocation, useNavigate, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Phone, Mail, MapPin, Clock, Star, Share2, Mail as MailIcon, HardHat, Settings, Package } from "lucide-react";
+import { ArrowLeft, Phone, Mail, MapPin, Clock, Star, Share2 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { AppShell } from "@/components/falcon/AppShell";
 import { bookingStore } from "@/lib/booking";
 import { getFirm } from "@/lib/firms";
@@ -14,7 +12,7 @@ const CATEGORIES = [
   { title: "Property Boundary", color: "from-primary to-primary-glow", items: ["Relocation", "Boundary", "Verification"] },
   { title: "Land Division", color: "from-primary to-accent", items: ["Subdivision", "Consolidation", "Sub-Consol"] },
   { title: "Legal Titling", color: "from-accent to-primary", items: ["Cadastral", "Original"] },
-  { title: "Specialized", color: "from-accent to-primary-glow", items: ["As-Built", "Hydrographic", "Topographic", "Alignment"] },
+  { title: "Specialized", color: "from-accent to-primary-glow", items: ["As-Built", "Topographic", "Alignment"] },
 ];
 
 export const Route = createFileRoute("/firm/$id")({
@@ -47,13 +45,12 @@ function FirmProfile() {
   const location = useLocation();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<string[]>(firm.services.slice(0, 2));
+  const initialRating = Math.round(firm.rating);
   const [ratings, setRatings] = useState<{ Punctuality: number; Professionalism: number; Service: number }>({
-    Punctuality: 0,
-    Professionalism: 0,
-    Service: 0,
+    Punctuality: initialRating,
+    Professionalism: initialRating,
+    Service: initialRating,
   });
-  const [feedback, setFeedback] = useState("");
-  const currentStatus = 1; // 0..3
 
   const toggle = (s: string) =>
     setSelected((p) => (p.includes(s) ? p.filter((x) => x !== s) : [...p, s]));
@@ -160,44 +157,6 @@ function FirmProfile() {
         </div>
       </div>
 
-      {/* Status Tracker */}
-      <div className="px-5 mt-8">
-        <h2 className="font-display text-base mb-3">Status</h2>
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            { label: "Received", icon: MailIcon },
-            { label: "Conduct Field", icon: HardHat },
-            { label: "Processing", icon: Settings },
-            { label: "Done", icon: Package },
-          ].map((s, i) => {
-            const Icon = s.icon;
-            const reached = i <= currentStatus;
-            return (
-              <div key={s.label} className="flex flex-col items-center gap-2">
-                <div
-                  className={cn(
-                    "h-12 w-12 rounded-2xl flex items-center justify-center border",
-                    reached
-                      ? "gradient-primary border-transparent shadow-pin"
-                      : "bg-secondary/50 border-border",
-                  )}
-                >
-                  <Icon
-                    className={cn(
-                      "h-5 w-5",
-                      reached ? "text-primary-foreground" : "text-muted-foreground",
-                    )}
-                  />
-                </div>
-                <span className="text-[10px] font-poppins text-center text-foreground/80 leading-tight">
-                  {s.label}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
       {/* Rate */}
       <div className="px-5 mt-7">
         <h2 className="font-display text-base mb-3">Rate</h2>
@@ -228,28 +187,6 @@ function FirmProfile() {
         </div>
       </div>
 
-      {/* Feedback */}
-      <div className="px-5 mt-7">
-        <h2 className="font-display text-base mb-3">Feedback</h2>
-        <Textarea
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          placeholder="Share your experience with this firm..."
-          className="min-h-[100px] rounded-2xl bg-input border-border font-poppins"
-        />
-        <Button
-          variant="outline"
-          className="w-full mt-3 font-poppins"
-          onClick={() => {
-            toast.success("Feedback submitted", {
-              description: "Thanks for rating this firm.",
-            });
-            setFeedback("");
-          }}
-        >
-          Submit Feedback
-        </Button>
-      </div>
 
       {/* Bottom spacer so sticky CTA doesn't cover content */}
       <div className="h-32" />
