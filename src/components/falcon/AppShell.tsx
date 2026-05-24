@@ -35,7 +35,8 @@ export const AppShell = ({
           </div>
         </header>
       )}
-      <main className="flex-1 pb-24">{children}</main>
+      <main className={cn("flex-1", path === "/" ? "pb-6" : "pb-24")}>{children}</main>
+      {path !== "/" && (
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-50 px-4 pb-3">
         <div className="flex items-center justify-around bg-card/95 backdrop-blur-xl border border-border rounded-2xl shadow-card-elegant py-2">
           {tabs.map((t, i) => {
