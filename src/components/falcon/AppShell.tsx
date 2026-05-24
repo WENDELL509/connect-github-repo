@@ -60,6 +60,7 @@ export const AppShell = ({
           })}
         </div>
       </nav>
+      )}
     </div>
   );
 };
