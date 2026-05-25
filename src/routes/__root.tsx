@@ -75,11 +75,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Falcon Geosolutions — Surveying Firms in Davao" },
       { name: "description", content: "Find and book licensed geodetic surveying firms in Davao City." },
       { name: "author", content: "Falcon Geosolutions" },
-      { property: "og:title", content: "Falcon Geosolutions" },
-      { property: "og:description", content: "Surveying firms directory for Davao City." },
+      { property: "og:title", content: "Falcon Geosolutions — Surveying Firms in Davao" },
+      { property: "og:description", content: "Find and book licensed geodetic surveying firms in Davao City." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Falcon Geosolutions — Surveying Firms in Davao" },
+      { name: "twitter:description", content: "Find and book licensed geodetic surveying firms in Davao City." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/64d8cc90-8c96-4760-8aa4-4687772235d8/id-preview-95c7424c--fc33c248-aed4-4801-9e6e-d7c0beac418c.lovable.app-1779677564088.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/64d8cc90-8c96-4760-8aa4-4687772235d8/id-preview-95c7424c--fc33c248-aed4-4801-9e6e-d7c0beac418c.lovable.app-1779677564088.png" },
     ],
     links: [
       {
