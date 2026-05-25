@@ -67,7 +67,7 @@ function FirmProfile() {
   };
 
   const onBook = () => {
-    bookingStore.set({ selectedSurveys: selected, firmId: firm.id });
+    bookingStore.set({ selectedSurveys: selected, firmId: firm.id, lotCount });
     navigate({ to: "/firm/$id/book", params: { id: firm.id } });
   };
 
