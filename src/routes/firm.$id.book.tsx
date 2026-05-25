@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Upload, FileText, BadgeCheck, Zap, Calendar as CalendarIcon, Sun, Moon, Receipt, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { AppShell } from "@/components/falcon/AppShell";
