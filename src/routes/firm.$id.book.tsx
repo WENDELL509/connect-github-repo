@@ -186,7 +186,7 @@ function BookingForm() {
           </div>
 
           <Field label="Terrain Type">
-            <Select>
+            <Select value={terrain} onValueChange={(v) => setTerrain(v as typeof terrain)}>
               <FieldTrigger placeholder="Select terrain" />
               <SelectContent>
                 <SelectItem value="level">Level</SelectItem>
@@ -197,7 +197,7 @@ function BookingForm() {
           </Field>
 
           <Field label="Vegetation Status">
-            <Select>
+            <Select value={vegetation} onValueChange={(v) => setVegetation(v as typeof vegetation)}>
               <FieldTrigger placeholder="Select vegetation" />
               <SelectContent>
                 <SelectItem value="clear">Clear</SelectItem>
@@ -208,7 +208,7 @@ function BookingForm() {
           </Field>
 
           <Field label="Topographic Slope">
-            <Select>
+            <Select value={slope} onValueChange={(v) => setSlope(v as typeof slope)}>
               <FieldTrigger placeholder="Select slope" />
               <SelectContent>
                 <SelectItem value="below18">Below 18% slope</SelectItem>
@@ -219,15 +219,25 @@ function BookingForm() {
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Boundary Markers" hint="4 corners standard">
-              <FieldInput type="number" defaultValue={4} min={1} />
+              <FieldInput
+                type="number"
+                value={markers}
+                min={1}
+                onChange={(e) => setMarkers(Math.max(1, parseInt(e.target.value) || 1))}
+              />
             </Field>
             <Field label="Total Lot Area" hint="square meters">
-              <FieldInput type="number" placeholder="0" />
+              <FieldInput
+                type="number"
+                placeholder="0"
+                value={areaSqm || ""}
+                onChange={(e) => setAreaSqm(Math.max(0, parseInt(e.target.value) || 0))}
+              />
             </Field>
           </div>
 
           <Field label="Land Use Classification">
-            <Select>
+            <Select value={landUse} onValueChange={(v) => setLandUse(v as typeof landUse)}>
               <FieldTrigger placeholder="Select classification" />
               <SelectContent>
                 <SelectItem value="agri">Agricultural / Institutional</SelectItem>
