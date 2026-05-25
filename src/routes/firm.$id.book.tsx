@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Upload, FileText, BadgeCheck, Zap, Calendar as CalendarIcon, Sun, Moon, Receipt, ChevronRight } from "lucide-react";
 import { format } from "date-fns";
 import { AppShell } from "@/components/falcon/AppShell";
@@ -40,9 +40,8 @@ export const Route = createFileRoute("/firm/$id/book")({
 
 function BookingForm() {
   const navigate = useNavigate();
-  const router = useRouter();
   const { id } = Route.useParams();
-  const { selectedSurveys } = useBooking();
+  const { selectedSurveys, lotCount: storedLots } = useBooking();
   const surveys = selectedSurveys.length ? selectedSurveys : ["Boundary", "Subdivision"];
   const [step, setStep] = useState<1 | 2>(1);
   const [urgency, setUrgency] = useState<"Standard" | "Rush">("Standard");
@@ -50,61 +49,76 @@ function BookingForm() {
   const [date, setDate] = useState<Date | undefined>();
   const [notes, setNotes] = useState("");
 
-  const mapToSurveyType = (s: string): "RELOCATION_SURVEY" | "ORIGINAL_SURVEY" | "VERIFICATION_SURVEY" => {
-    const k = s.toLowerCase();
-    if (k.includes("relocation")) return "RELOCATION_SURVEY";
-    if (k.includes("verification") || k.includes("boundary")) return "VERIFICATION_SURVEY";
-    return "ORIGINAL_SURVEY";
-  };
+  // Controlled inputs feeding the pricing engine
+  const [terrain, setTerrain] = useState<"level" | "rolling" | "rugged" | "">("");
+  const [vegetation, setVegetation] = useState<"clear" | "light" | "heavy" | "">("");
+  const [slope, setSlope] = useState<"below18" | "over18" | "">("");
+  const [markers, setMarkers] = useState<number>(4);
+  const [areaSqm, setAreaSqm] = useState<number>(0);
+  const [landUse, setLandUse] = useState<"agri" | "res" | "ind" | "com" | "">("");
+
+  const LAND_DIVISION = ["Subdivision", "Consolidation", "Sub-Consol"];
+  const boundarySurveys = surveys
+    .map((s) => {
+      const k = s.toLowerCase();
+      if (k.includes("relocation")) return "RELOCATION_SURVEY";
+      if (k.includes("verification") || k.includes("boundary")) return "VERIFICATION_SURVEY";
+      if (k === "original" || k === "cadastral") return "ORIGINAL_SURVEY";
+      return null;
+    })
+    .filter((x): x is "RELOCATION_SURVEY" | "ORIGINAL_SURVEY" | "VERIFICATION_SURVEY" => !!x);
+  const landDivisionPick = surveys.find((s) => LAND_DIVISION.includes(s));
+
+  const landUseKey =
+    landUse === "agri" ? "AGRICULTURAL"
+      : landUse === "res" ? "RESIDENTIAL"
+      : landUse === "ind" ? "INDUSTRIAL"
+      : landUse === "com" ? "COMMERCIAL"
+      : "AGRICULTURAL";
 
   const quote = useMemo(() => {
     try {
-      const accum = {
-        baseSurveyFee: 0,
-        zoningAdjustment: 0,
-        adjustedSurveyCost: 0,
-        topographicCost: 0,
-        establishmentFee: 0,
-        disbursementsOverhead: 0,
-        hazardPay: 0,
-        contingencyBuffer: 0,
-        firmProfit: 0,
-        statutoryVat: 0,
-      };
-      let total = 0;
-      for (const s of surveys) {
-        const q = SurveyPricingEngine.generateProjectQuote({
-          surveyType: mapToSurveyType(s),
-          areaInHectares: 12.5,
-          landUseType: "COMMERCIAL",
-          topoInterval: 0.5,
-          slopeDegrees: 22,
-          disbursements: 4500,
-          isHighRiskZone: true,
-        });
-        for (const k of Object.keys(accum) as (keyof typeof accum)[]) {
-          accum[k] += q.breakdown[k] ?? 0;
-        }
-        total += q.totalContractPrice;
-      }
-      return { breakdown: accum, totalContractPrice: Math.round(total * 100) / 100 };
+      const areaInHectares = (areaSqm || 0) / 10000;
+      if (areaInHectares <= 0 || boundarySurveys.length === 0) return null;
+
+      const markerCost = (markers || 0) * 75;
+      const rushFee = urgency === "Rush" ? 10000 : 0;
+      const terrainCost = terrain === "rugged" ? 8000 : terrain === "rolling" ? 3000 : 0;
+      const vegetationCost = vegetation === "heavy" ? 7000 : vegetation === "light" ? 3000 : 0;
+
+      // Subdivision: use stored lot count from firm page; classification falls back to residential matrix for COMMERCIAL/INDUSTRIAL
+      const subdivisionClass = landUseKey === "AGRICULTURAL" ? "AGRICULTURAL" : "RESIDENTIAL";
+      const subdivisionFee = landDivisionPick && storedLots
+        ? SurveyPricingEngine.calculateSubdivisionFee(subdivisionClass, storedLots)
+        : 0;
+
+      const q = SurveyPricingEngine.generateProjectQuote({
+        surveyTypes: boundarySurveys,
+        areaInHectares,
+        landUseType: landUseKey,
+        slopeDegrees: slope === "over18" ? 20 : 0,
+        subdivisionFee,
+        additionalFixedCosts: markerCost + rushFee + terrainCost + vegetationCost + subdivisionFee,
+        disbursements: 3000,
+      });
+      return q;
     } catch {
       return null;
     }
-  }, [surveys]);
+  }, [areaSqm, boundarySurveys, landUseKey, markers, urgency, terrain, vegetation, slope, landDivisionPick, storedLots]);
 
   const billingRows = quote
-    ? [
+    ? ([
         ["Boundary Survey Fee", quote.breakdown.baseSurveyFee],
+        ...(quote.breakdown.subdivisionFee ? [["Subdivision Fee", quote.breakdown.subdivisionFee]] : []),
         ["Zoning Adjustment Modifier", quote.breakdown.zoningAdjustment],
         ["Contour Mapping", quote.breakdown.topographicCost],
-        ["Terrain Complexity Penalty", quote.breakdown.hazardPay],
         ["Document Filing Disbursements", quote.breakdown.disbursementsOverhead],
         ["System Establishment Fee", quote.breakdown.establishmentFee],
         ["Project Contingency Buffer", quote.breakdown.contingencyBuffer],
         ["Corporate Profit Margin", quote.breakdown.firmProfit],
         ["VAT (12%)", quote.breakdown.statutoryVat],
-      ] as const
+      ] as Array<[string, number]>)
     : [];
 
   const goBack = () => {
@@ -112,7 +126,7 @@ function BookingForm() {
       setStep(1);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
-      router.history.back();
+      navigate({ to: "/firm/$id", params: { id } });
     }
   };
 
@@ -172,7 +186,7 @@ function BookingForm() {
           </div>
 
           <Field label="Terrain Type">
-            <Select>
+            <Select value={terrain} onValueChange={(v) => setTerrain(v as typeof terrain)}>
               <FieldTrigger placeholder="Select terrain" />
               <SelectContent>
                 <SelectItem value="level">Level</SelectItem>
@@ -183,7 +197,7 @@ function BookingForm() {
           </Field>
 
           <Field label="Vegetation Status">
-            <Select>
+            <Select value={vegetation} onValueChange={(v) => setVegetation(v as typeof vegetation)}>
               <FieldTrigger placeholder="Select vegetation" />
               <SelectContent>
                 <SelectItem value="clear">Clear</SelectItem>
@@ -194,7 +208,7 @@ function BookingForm() {
           </Field>
 
           <Field label="Topographic Slope">
-            <Select>
+            <Select value={slope} onValueChange={(v) => setSlope(v as typeof slope)}>
               <FieldTrigger placeholder="Select slope" />
               <SelectContent>
                 <SelectItem value="below18">Below 18% slope</SelectItem>
@@ -205,15 +219,25 @@ function BookingForm() {
 
           <div className="grid grid-cols-2 gap-3">
             <Field label="Boundary Markers" hint="4 corners standard">
-              <FieldInput type="number" defaultValue={4} min={1} />
+              <FieldInput
+                type="number"
+                value={markers}
+                min={1}
+                onChange={(e) => setMarkers(Math.max(1, parseInt(e.target.value) || 1))}
+              />
             </Field>
             <Field label="Total Lot Area" hint="square meters">
-              <FieldInput type="number" placeholder="0" />
+              <FieldInput
+                type="number"
+                placeholder="0"
+                value={areaSqm || ""}
+                onChange={(e) => setAreaSqm(Math.max(0, parseInt(e.target.value) || 0))}
+              />
             </Field>
           </div>
 
           <Field label="Land Use Classification">
-            <Select>
+            <Select value={landUse} onValueChange={(v) => setLandUse(v as typeof landUse)}>
               <FieldTrigger placeholder="Select classification" />
               <SelectContent>
                 <SelectItem value="agri">Agricultural / Institutional</SelectItem>

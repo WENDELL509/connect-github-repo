@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-type State = { selectedSurveys: string[]; firmId?: string };
+type State = { selectedSurveys: string[]; firmId?: string; lotCount?: number };
 const STORAGE_KEY = "falcon-booking";
 
 const load = (): State => {
