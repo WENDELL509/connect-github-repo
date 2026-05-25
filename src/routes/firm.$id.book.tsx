@@ -87,10 +87,7 @@ function BookingForm() {
       const vegetationCost = vegetation === "heavy" ? 7000 : vegetation === "light" ? 3000 : 0;
 
       // Subdivision: use stored lot count from firm page; classification falls back to residential matrix for COMMERCIAL/INDUSTRIAL
-      const subdivisionClass =
-        landUseKey === "AGRICULTURAL" || landUseKey === "INSTITUTIONAL"
-          ? landUseKey
-          : "RESIDENTIAL";
+      const subdivisionClass = landUseKey === "AGRICULTURAL" ? "AGRICULTURAL" : "RESIDENTIAL";
       const subdivisionFee = landDivisionPick && storedLots
         ? SurveyPricingEngine.calculateSubdivisionFee(subdivisionClass, storedLots)
         : 0;
