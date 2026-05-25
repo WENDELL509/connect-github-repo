@@ -12,7 +12,7 @@ const CATEGORIES = [
   { title: "Property Boundary", color: "from-primary to-primary-glow", items: ["Relocation", "Boundary", "Verification"] },
   { title: "Land Division", color: "from-primary to-accent", items: ["Subdivision", "Consolidation", "Sub-Consol"] },
   { title: "Legal Titling", color: "from-accent to-primary", items: ["Cadastral", "Original"] },
-  { title: "Specialized", color: "from-accent to-primary-glow", items: ["As-Built", "Topographic", "Alignment"] },
+  { title: "Specialized", color: "from-accent to-primary-glow", items: ["As-Built", "Alignment"] },
 ];
 
 export const Route = createFileRoute("/firm/$id")({
